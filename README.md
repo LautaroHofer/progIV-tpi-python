@@ -3,7 +3,7 @@
 API Python para el sistema de gestión y reserva de turnos.
 
 ## Integrantes (Grupo 1 - Comisión 2)
-- Lautaro Hoffer
+- Lautaro Hofer
 - Erick Vicentin
 - Santiago Nickisch
 
