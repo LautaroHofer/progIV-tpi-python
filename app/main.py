@@ -1,15 +1,12 @@
 from fastapi import FastAPI
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
+from app.config.env import config
 
 app = FastAPI(title="API Python - TP Prog IV")
 
 
 @app.get("/salud")
 def salud():
-    return {"estado": "ok", "servicio": "api-python"}
+    return {"estado": "ok", "servicio": "api-python", "puerto": config.PORT}
 
 
 @app.get("/")
