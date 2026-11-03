@@ -33,7 +33,6 @@ Ver documentación detallada en `docs/api.md`.
 ### Salud y disponibilidad
 - `GET /health`
 - `GET /ready`
-- `GET /salud`
 
 ### Horarios y Grilla
 - `GET /api/horarios/`
