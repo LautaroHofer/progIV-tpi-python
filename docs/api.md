@@ -7,7 +7,6 @@ Base URL: `http://localhost:8000`
 |--------|----------|-------------|
 | GET | `/health` | Proceso vivo |
 | GET | `/ready` | Listo para recibir peticiones |
-| GET | `/salud` | Estado del servicio |
 
 ## Horarios y Grilla
 | Método | Endpoint | Descripción |
