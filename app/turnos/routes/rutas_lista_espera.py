@@ -1,5 +1,5 @@
 from django.urls import path
-from app.infra.http.controladores import lista_espera_controlador
+from app.turnos.views import lista_espera_controlador
 
 urlpatterns = [
     path("", lista_espera_controlador.unirse_lista_espera),

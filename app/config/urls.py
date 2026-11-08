@@ -12,7 +12,7 @@ urlpatterns = [
     path("health", health),
     path("ready", ready),
     path("salud", health),
-    path("api/horarios/", include("app.infra.http.rutas.rutas_horarios")),
-    path("api/turnos/", include("app.infra.http.rutas.rutas_turnos")),
-    path("api/lista-espera/", include("app.infra.http.rutas.rutas_lista_espera")),
+    path("api/horarios/", include("app.turnos.routes.rutas_horarios")),
+    path("api/turnos/", include("app.turnos.routes.rutas_turnos")),
+    path("api/lista-espera/", include("app.turnos.routes.rutas_lista_espera")),
 ]
