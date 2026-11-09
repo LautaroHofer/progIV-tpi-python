@@ -1,5 +1,5 @@
 from django.urls import path
-from app.infra.http.controladores import turno_controlador
+from app.turnos.views import turno_controlador
 
 urlpatterns = [
     path("", turno_controlador.listar_turnos),
