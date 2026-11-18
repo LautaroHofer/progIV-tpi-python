@@ -1,3 +1,8 @@
-# Tests de integración de Turnos y Horarios contra la base de datos
-def test_integracion_turnos_placeholder():
-    assert True
+# Tests de integracion de conexion a Firestore
+from app.infra.db.conexion import db
+
+
+def test_firestore_inicializado():
+    assert db is not None
+    assert hasattr(db, "collection")
+
