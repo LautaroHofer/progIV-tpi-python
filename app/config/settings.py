@@ -1,13 +1,8 @@
-# Configuración mínima de Django (Módulo Horarios y Turnos)
+# Configuración mínima de Django (Módulo Horarios y Turnos con Cloud Firestore)
 import os
-from pathlib import Path
-from dotenv import load_dotenv
+from app.config.env import BASE_DIR, config
 
-load_dotenv()
-
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-SECRET_KEY = os.getenv("SECRET_KEY", "clave-secreta-desarrollo")
+SECRET_KEY = config["secret_key"]
 DEBUG = os.getenv("DEBUG", "True") == "True"
 ALLOWED_HOSTS = ["*"]
 
@@ -23,16 +18,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "app.config.urls"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME", "tp_prog4"),
-        "USER": os.getenv("DB_USER", "postgres"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "postgres"),
-        "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "5432"),
-    }
-}
+# La persistencia se gestiona mediante Cloud Firestore (app/infra/db/conexion.py)
+DATABASES = {}
 
 USE_TZ = True
 TIME_ZONE = "America/Argentina/Buenos_Aires"
