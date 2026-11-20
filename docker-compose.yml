@@ -23,6 +23,7 @@ services:
       - MONGO_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=tp_prog4
       - NODE_API_URL=http://node:3000
+      - JWT_SECRET=cambiar-en-produccion
     depends_on:
       - mongo
 
