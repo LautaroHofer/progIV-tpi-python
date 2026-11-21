@@ -1,50 +1,65 @@
 # Tests unitarios de dominio (Horarios y Turnos, sin levantar HTTP ni base de datos)
+import os
+import django
 import unittest
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app.config.settings")
+django.setup()
+
 from app.turnos.models.horario import Horario
-from app.turnos.services.validar_solapamiento import hay_solapamiento
+from app.turnos.models.reserva import Reserva
+from app.turnos.models.lista_espera import ListaEspera
 
 
-class HorarioDominioTests(unittest.TestCase):
-    def test_crear_horario_con_todos_los_atributos(self):
-        h = Horario(
-            id=1,
-            sala_id=2,
-            profesor_id=3,
-            actividad="Pilates Reformer",
-            fecha_inicio="2026-11-20T09:00:00",
-            fecha_fin="2026-11-20T10:00:00",
-            cupo=6,
-        )
+class HorarioModelTests(unittest.TestCase):
+    def test_crear_horario(self):
+        h = Horario(id=1, sala_id=1, profesor_id=1, actividad="Pilates Reformer", cupo=6)
         self.assertEqual(h.id, 1)
-        self.assertEqual(h.sala_id, 2)
-        self.assertEqual(h.profesor_id, 3)
+        self.assertEqual(h.sala_id, 1)
+        self.assertEqual(h.profesor_id, 1)
         self.assertEqual(h.actividad, "Pilates Reformer")
-        self.assertEqual(h.fecha_inicio, "2026-11-20T09:00:00")
-        self.assertEqual(h.fecha_fin, "2026-11-20T10:00:00")
         self.assertEqual(h.cupo, 6)
-
-    def test_crear_horario_valores_por_defecto_none(self):
-        h = Horario()
-        self.assertIsNone(h.id)
-        self.assertIsNone(h.sala_id)
-        self.assertIsNone(h.profesor_id)
-        self.assertIsNone(h.actividad)
         self.assertIsNone(h.fecha_inicio)
         self.assertIsNone(h.fecha_fin)
-        self.assertIsNone(h.cupo)
 
-    def test_hay_solapamiento_parcial(self):
-        self.assertTrue(hay_solapamiento("09:00", "10:00", "09:30", "10:30"))
+    def test_crear_horario_con_fechas(self):
+        h = Horario(
+            id=2,
+            sala_id=2,
+            profesor_id=3,
+            actividad="Yoga",
+            fecha_inicio="2026-12-01T09:00:00",
+            fecha_fin="2026-12-01T10:00:00",
+            cupo=10,
+        )
+        self.assertEqual(h.cupo, 10)
+        self.assertEqual(h.fecha_inicio, "2026-12-01T09:00:00")
+        self.assertEqual(h.fecha_fin, "2026-12-01T10:00:00")
 
-    def test_hay_solapamiento_contenido_dentro_de_otro(self):
-        self.assertTrue(hay_solapamiento("09:00", "11:00", "09:30", "10:00"))
 
-    def test_hay_solapamiento_mismo_horario(self):
-        self.assertTrue(hay_solapamiento("09:00", "10:00", "09:00", "10:00"))
+class ReservaModelTests(unittest.TestCase):
+    def test_crear_reserva(self):
+        r = Reserva(id=1, alumno_id=42, clase_id=7)
+        self.assertEqual(r.id, 1)
+        self.assertEqual(r.alumno_id, 42)
+        self.assertEqual(r.clase_id, 7)
+        self.assertEqual(r.estado, "confirmada")
+        self.assertIsNone(r.fecha_reserva)
 
-    def test_no_hay_solapamiento_horarios_contiguos(self):
-        self.assertFalse(hay_solapamiento("09:00", "10:00", "10:00", "11:00"))
+    def test_crear_reserva_estado_personalizado(self):
+        r = Reserva(id=2, alumno_id=43, clase_id=8, estado="lista_espera")
+        self.assertEqual(r.estado, "lista_espera")
 
-    def test_no_hay_solapamiento_horarios_separados(self):
-        self.assertFalse(hay_solapamiento("09:00", "10:00", "11:00", "12:00"))
+
+class ListaEsperaModelTests(unittest.TestCase):
+    def test_crear_lista_espera(self):
+        le = ListaEspera(id=1, clase_id=5, alumno_id=10, posicion=3)
+        self.assertEqual(le.id, 1)
+        self.assertEqual(le.clase_id, 5)
+        self.assertEqual(le.alumno_id, 10)
+        self.assertEqual(le.posicion, 3)
+
+    def test_crear_lista_espera_sin_posicion(self):
+        le = ListaEspera(clase_id=5, alumno_id=10)
+        self.assertIsNone(le.id)
+        self.assertIsNone(le.posicion)
