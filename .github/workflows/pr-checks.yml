@@ -47,3 +47,10 @@ jobs:
           PYTHON_ENV: test
           SECRET_KEY: ci_django_secret_key
           JWT_SECRET: ci_secret_token_key_12345_con_32_bytes
+
+      - name: Run excepciones tests
+        run: python -m unittest tests/dominio/test_excepciones.py -v
+        env:
+          PYTHON_ENV: test
+          SECRET_KEY: ci_django_secret_key
+          JWT_SECRET: ci_secret_token_key_12345_con_32_bytes
