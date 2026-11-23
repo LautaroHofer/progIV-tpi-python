@@ -1,0 +1,38 @@
+meta {
+  name: Crear Clase Recurrente
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/horarios/clases-recurrentes
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "sucursal_id": "sucursal-centro",
+    "sala_id": "sala-reformer-1",
+    "profesor_id": "profe-1",
+    "actividad": "Pilates Reformer",
+    "dia_semana": 1,
+    "hora_inicio": "08:00",
+    "hora_fin": "09:00",
+    "zona_horaria": "America/Argentina/Buenos_Aires",
+    "cupo": 6
+  }
+}
+
+tests {
+  test("status code is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  if (res.body && res.body.id) {
+    bru.setVar("claseRecurrenteId", res.body.id);
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "version": "1.0.1",
+  "name": "TIP PROG IV - PYTHON",
+  "type": "collection",
+  "ignore": [
+    ".venv",
+    "__pycache__",
+    ".git"
+  ]
+}
