@@ -4,3 +4,4 @@ psycopg2-binary>=2.9.11
 python-dotenv==1.0.0
 pymongo==4.10.1
 PyJWT==2.15.1
+tzdata>=2024.1
