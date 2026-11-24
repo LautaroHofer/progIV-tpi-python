@@ -1,0 +1,22 @@
+meta {
+  name: Listar Horarios
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/horarios/?sucursal_id=sucursal-centro&limite=20
+  body: none
+  auth: none
+}
+
+params:query {
+  sucursal_id: sucursal-centro
+  limite: 20
+}
+
+tests {
+  test("status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Generar Grilla
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/horarios/generar-grilla
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "fecha_inicio": "2026-12-01",
+    "meses": 3,
+    "sucursal_id": "sucursal-centro"
+  }
+}
+
+tests {
+  test("status code is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+}
