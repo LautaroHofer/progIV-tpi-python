@@ -1,6 +1,5 @@
 # Caso de uso: Cancelar turno (implementación real)
 from datetime import datetime, timedelta
-from app.infra.db.mongo import obtener_db_mongo
 from app.turnos.services import credito_cliente
 
 COLECCION_CLASES = "clases_recurrentes"
@@ -9,13 +8,18 @@ COLECCION_RESERVAS = "reservas"
 VENTANA_CANCELACION_HORAS = 4
 
 
+def _obtener_db():
+    from app.infra.db.mongo import obtener_db_mongo
+    return obtener_db_mongo()
+
+
 def cancelar_turno(reserva_id, db=None):
     """Cancela una reserva y devuelve el crédito si está dentro de la ventana.
 
     Es idempotente: cancelar dos veces la misma reserva solo devuelve el
     crédito una vez.
     """
-    base = db if db is not None else obtener_db_mongo()
+    base = db if db is not None else _obtener_db()
 
     # Buscar la reserva
     reserva = base[COLECCION_RESERVAS].find_one({"_id": reserva_id})

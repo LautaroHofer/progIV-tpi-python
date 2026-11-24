@@ -1,10 +1,14 @@
 # Caso de uso: Reservar turno (implementación real)
 from datetime import datetime
-from app.infra.db.mongo import obtener_db_mongo
 from app.turnos.services import credito_cliente
 
 COLECCION_CLASES = "clases_recurrentes"
 COLECCION_RESERVAS = "reservas"
+
+
+def _obtener_db():
+    from app.infra.db.mongo import obtener_db_mongo
+    return obtener_db_mongo()
 
 
 def reservar_turno(alumno_id, clase_id, db=None):
@@ -14,7 +18,7 @@ def reservar_turno(alumno_id, clase_id, db=None):
     la API de Node, crea la reserva en MongoDB y decrementa el cupo
     de la clase.
     """
-    base = db if db is not None else obtener_db_mongo()
+    base = db if db is not None else _obtener_db()
 
     # Verificar que la clase exista y tenga cupo
     clase = base[COLECCION_CLASES].find_one({"_id": clase_id})
