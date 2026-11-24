@@ -1,9 +1,13 @@
 # Controlador / Vistas de Horarios y Grilla (Django)
+from datetime import date
 import json
 import re
 from django.http import JsonResponse
 from app.turnos.middlewares.auth import requiere_auth, requiere_rol
 from app.turnos.services.validar_solapamiento import crear_clase_recurrente
+from app.turnos.services.generar_grilla import generar_grilla_horarios, listar_ocurrencias
+
+CAMPOS_GENERAR_GRILLA = {"fecha_inicio", "meses", "sucursal_id"}
 
 CAMPOS_PERMITIDOS = {
     "sucursal_id",
@@ -57,11 +61,69 @@ def _validar_clase_recurrente(data):
 
 
 def listar_horarios(request):
-    return JsonResponse([], safe=False)
+    if request.method != "GET":
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+    filtros = {
+        campo: request.GET.get(campo)
+        for campo in ("sucursal_id", "sala_id", "profesor_id", "estado", "desde", "hasta")
+        if request.GET.get(campo)
+    }
+
+    limite_raw = request.GET.get("limite", "100")
+    try:
+        limite = int(limite_raw)
+        if limite <= 0:
+            raise ValueError()
+    except ValueError:
+        return JsonResponse({"error": "limite debe ser un entero positivo"}, status=400)
+
+    horarios = listar_ocurrencias(filtros=filtros, limite=limite)
+    return JsonResponse(horarios, safe=False)
 
 
+@requiere_auth
+@requiere_rol(["admin"])
 def generar_grilla(request):
-    return JsonResponse({"mensaje": "Generación de grilla (placeholder)"}, status=201)
+    if request.method != "POST":
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+    try:
+        data = json.loads(request.body or "{}")
+    except (json.JSONDecodeError, ValueError):
+        return JsonResponse({"error": "Cuerpo JSON inválido"}, status=400)
+
+    if not isinstance(data, dict):
+        return JsonResponse({"error": "El cuerpo debe ser un objeto JSON"}, status=400)
+
+    extras = set(data.keys()) - CAMPOS_GENERAR_GRILLA
+    if extras:
+        return JsonResponse({"error": f"Campos no permitidos: {', '.join(sorted(extras))}"}, status=400)
+
+    fecha_inicio = data.get("fecha_inicio")
+    if fecha_inicio is not None:
+        if not isinstance(fecha_inicio, str) or len(fecha_inicio) != 10:
+            return JsonResponse({"error": "fecha_inicio debe tener formato YYYY-MM-DD"}, status=400)
+        try:
+            date.fromisoformat(fecha_inicio)
+        except ValueError:
+            return JsonResponse({"error": "fecha_inicio inválida (usar YYYY-MM-DD)"}, status=400)
+
+    meses = data.get("meses", 3)
+    sucursal_id = data.get("sucursal_id")
+    if sucursal_id is not None and (not isinstance(sucursal_id, str) or not sucursal_id.strip()):
+        return JsonResponse({"error": "sucursal_id debe ser un texto no vacío"}, status=400)
+
+    try:
+        resumen = generar_grilla_horarios(
+            fecha_inicio=fecha_inicio,
+            meses=meses,
+            sucursal_id=sucursal_id,
+        )
+    except ValueError as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
+
+    return JsonResponse(resumen, status=201)
 
 
 @requiere_auth
