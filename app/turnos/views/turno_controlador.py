@@ -3,6 +3,7 @@ import json
 from django.http import JsonResponse
 from app.turnos.middlewares.auth import requiere_auth, requiere_rol
 from app.turnos.validators import validar_reservar_turno, validar_cancelar_turno
+from app.turnos.services import reservar_turno, cancelar_turno
 
 
 def _parse_body(request):
@@ -37,27 +38,22 @@ def reservar_turno(request):
             status=400,
         )
 
-    # Entrada válida: aquí se conectará el servicio de reserva una vez
-    # definido el repositorio de persistencia.
-    return JsonResponse(
-        {
-            "mensaje": "Turno reservado (placeholder)",
-            "usuario_sub": request.usuario.get("sub"),
-            "rol": request.usuario.get("rol"),
-            "datos_validados": datos_validos,
-        },
-        status=201,
-    )
+    # El alumno_id viene del token JWT, no del cuerpo de la petición
+    alumno_id = request.usuario.get("sub")
+    clase_id = datos_validos.get("clase_id")
+
+    try:
+        reserva = reservar_turno(alumno_id, clase_id)
+        return JsonResponse(reserva, status=201)
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
 
 
 @requiere_auth
 @requiere_rol(["alumno", "admin"])
 def cancelar_turno(request, id):
-    datos_validos, errores = validar_cancelar_turno({"id": id})
-    if errores:
-        return JsonResponse(
-            {"error": "Datos inválidos", "detalles": errores},
-            status=400,
-        )
-
-    return JsonResponse({"mensaje": f"Turno {id} cancelado (placeholder)"})
+    try:
+        resultado = cancelar_turno(id)
+        return JsonResponse(resultado)
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
